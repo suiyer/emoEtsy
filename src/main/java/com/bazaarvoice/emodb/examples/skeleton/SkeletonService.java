@@ -14,6 +14,7 @@ import com.yammer.dropwizard.client.JerseyClient;
 import com.yammer.dropwizard.client.JerseyClientFactory;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.lifecycle.Managed;
+import com.yammer.dropwizard.views.ViewBundle;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,6 +28,7 @@ public class SkeletonService extends Service<SkeletonConfiguration> {
 
     protected SkeletonService() {
         super("skeleton");
+        addBundle(new ViewBundle());
     }
 
     protected void initialize(SkeletonConfiguration configuration, Environment environment) throws Exception {
