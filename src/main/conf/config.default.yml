@@ -39,6 +39,8 @@ sorEndPointOverrides:
 dbusEndPointOverrides:
   ec2-67-202-37-74.compute-1.amazonaws.com: {}
 
+bstoreEndPointOverrides:
+  ec2-67-202-37-74.compute-1.amazonaws.com: {}
 
 logging:
   loggers:

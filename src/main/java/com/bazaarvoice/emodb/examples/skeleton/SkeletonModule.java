@@ -1,5 +1,7 @@
 package com.bazaarvoice.emodb.examples.skeleton;
 
+import com.bazaarvoice.emodb.blob.api.BlobStore;
+import com.bazaarvoice.emodb.blob.client.BlobStoreClientFactory;
 import com.bazaarvoice.emodb.databus.api.Databus;
 import com.bazaarvoice.emodb.databus.client.DatabusClientFactory;
 import com.bazaarvoice.emodb.esquire.api.Esquire;
@@ -20,6 +22,7 @@ import com.google.inject.Provider;
 import com.yammer.dropwizard.client.JerseyClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
@@ -63,7 +66,7 @@ public class SkeletonModule extends AbstractModule {
         bind(DataStore.class).toInstance(createDataStoreClient());  // The client you will use to access the System of Record
         bind(Databus.class).toInstance(createDataBusClient());      // The client you will use to access the Databus
         bind(Esquire.class).toInstance(createEsquireClient());      // The client (or example thereof) you will use to access ElasticSearch
-
+        //bind(BlobStore.class).toInstance(createBlobStoreClient());
         bind(DatabusListeningConfiguration.class).toInstance(skeletonConfiguration.getDatabusListeningConfiguration());
         bind(ExecutorService.class).annotatedWith(DatabusResource.class).toInstance(databusPollingExecutorService);
         bind(ScheduledExecutorService.class).annotatedWith(DatabusResource.class).toInstance(databusSubscriptionExecutorService);
@@ -76,6 +79,17 @@ public class SkeletonModule extends AbstractModule {
                 .withHostDiscoverySource(skeletonConfiguration.getSorEndPointOverrides())
                 .withHostDiscovery(new ZooKeeperHostDiscovery(zooKeeperConnection, dataStoreClientFactory.getServiceName()))
                 .withServiceFactory(dataStoreClientFactory)
+                .withHealthCheckExecutor(Executors.newScheduledThreadPool(1, daemonThreadFactory))
+                .buildProxy(new RetryNTimes(3, 100, TimeUnit.MILLISECONDS));
+    }
+
+    private BlobStore createBlobStoreClient() {
+        ThreadFactory daemonThreadFactory = new ThreadFactoryBuilder().setDaemon(true).build();
+        BlobStoreClientFactory blobStoreClientFactory = new BlobStoreClientFactory(jerseyClientProvider.get());  // Creates an internal Apache HTTP Client
+        return ServicePoolBuilder.create(BlobStore.class)
+                .withHostDiscoverySource(skeletonConfiguration.getSorEndPointOverrides())
+                .withHostDiscovery(new ZooKeeperHostDiscovery(zooKeeperConnection, blobStoreClientFactory.getServiceName()))
+                .withServiceFactory(blobStoreClientFactory)
                 .withHealthCheckExecutor(Executors.newScheduledThreadPool(1, daemonThreadFactory))
                 .buildProxy(new RetryNTimes(3, 100, TimeUnit.MILLISECONDS));
     }

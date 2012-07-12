@@ -28,6 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import com.yammer.dropwizard.jersey.params.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
@@ -49,13 +50,13 @@ public class FeedbackResource {
     @PUT
     @Path("sor/{feedbackid}")
     @Consumes (MediaType.APPLICATION_JSON)
-    public Response createFeedback(@PathParam ("feedbackid") String feedbackID, String feedback) {
+    public Response createFeedback(@PathParam ("feedbackid") String feedbackID, Map<String, Object> attributes) {
         createTableIfNonExistant();
         sorClient.update(
                 TABLE,
                 feedbackID,
                 TimeUUIDs.newUUID(),
-                Deltas.fromString(feedback),
+                Deltas.mapBuilder().putAll(attributes).put("type", "feedback").build(),
                 new AuditBuilder().setLocalHost().setProgram(WellKnowns.APP_NAME).setComment("Creating feedback").build(),
                 WriteConsistency.STRONG);
         return Response.ok().build();
@@ -75,9 +76,9 @@ public class FeedbackResource {
     @GET
     @Path("es/all")
     @Produces (MediaType.APPLICATION_JSON)
-    public Collection<Map<String, Object>> listAllUsers(@QueryParam ("limit") @DefaultValue ("100") IntParam limit) {
+    public Collection<Map<String, Object>> listAllFeedback(@QueryParam ("limit") @DefaultValue ("100") IntParam limit) {
         createTableIfNonExistant();
-        List<Entity> entities = esClient.queryTable(TABLE).type("user").limit(limit.get()).execute();
+        List<Entity> entities = esClient.queryTable(TABLE).type("feedback").limit(limit.get()).execute();
         return Collections2.transform(entities, new Function<Entity, Map<String, Object>>() {
             @Override
             public Map<String, Object> apply(@Nullable Entity input) {

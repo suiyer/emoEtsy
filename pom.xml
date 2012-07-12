@@ -49,6 +49,11 @@
             <version>${emodb.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.bazaarvoice.emodb</groupId>
+            <artifactId>emodb-blob-client</artifactId>
+            <version>${emodb.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.bazaarvoice.emodb.toolkit</groupId>
             <artifactId>esquire</artifactId>
             <version>0.4</version>

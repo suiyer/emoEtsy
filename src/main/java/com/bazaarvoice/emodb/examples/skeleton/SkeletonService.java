@@ -2,6 +2,7 @@ package com.bazaarvoice.emodb.examples.skeleton;
 
 import com.bazaarvoice.emodb.examples.skeleton.config.SkeletonConfiguration;
 import com.bazaarvoice.emodb.examples.skeleton.databus.ManagedDatabusListener;
+import com.bazaarvoice.emodb.examples.skeleton.resources.FeedbackResource;
 import com.bazaarvoice.emodb.examples.skeleton.resources.ListingResource;
 import com.bazaarvoice.emodb.examples.skeleton.resources.UserResource;
 import com.bazaarvoice.soa.zookeeper.ZooKeeperConnection;
@@ -35,6 +36,7 @@ public class SkeletonService extends Service<SkeletonConfiguration> {
 
         environment.addResource(injector.getInstance(UserResource.class));
         environment.addResource(injector.getInstance(ListingResource.class));
+        environment.addResource(injector.getInstance(FeedbackResource.class));
     }
 
     private SkeletonModule createSkeletonModule(SkeletonConfiguration configuration, Environment environment) {

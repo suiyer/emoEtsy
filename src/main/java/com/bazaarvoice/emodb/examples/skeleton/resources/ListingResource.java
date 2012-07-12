@@ -1,5 +1,6 @@
 package com.bazaarvoice.emodb.examples.skeleton.resources;
 
+import com.bazaarvoice.emodb.blob.api.BlobStore;
 import com.bazaarvoice.emodb.esquire.api.Entity;
 import com.bazaarvoice.emodb.esquire.api.Esquire;
 import com.bazaarvoice.emodb.examples.skeleton.WellKnowns;
@@ -41,6 +42,7 @@ public class ListingResource {
 
     @Inject
     private DataStore sorClient;
+   
     @Inject private Esquire esClient;
 
     private boolean tableExists;
@@ -129,7 +131,6 @@ public class ListingResource {
                 WriteConsistency.STRONG);
         return Response.ok().build();
     }
-
 
     private void createTableIfNonExistant() {
         if (!tableExists && !sorClient.getTableExists(TABLE)) {
